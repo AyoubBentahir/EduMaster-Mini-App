@@ -294,7 +294,7 @@ Ce projet est réalisé à des fins éducatives dans le cadre d'un cours univers
 
 ## 🔗 Liens Utiles
 
-- **Repository GitHub** : [À compléter]
+- **Repository GitHub** : [https://github.com/AyoubBentahir/EduMaster-Mini-App](https://github.com/AyoubBentahir/EduMaster-Mini-App)
 - **Application Déployée** : [À compléter - GitHub Pages/Vercel/Netlify]
 - **Documentation** : Ce README
 
