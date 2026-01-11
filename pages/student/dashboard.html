@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-LMS | Espace Étudiant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            padding-left: 16rem;
+        }
+    </style>
+</head>
+
+<body>
+    <aside id="sidebar"></aside>
+
+    <main class="min-h-screen p-8">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Mon Espace</h1>
+                <p class="text-gray-500 text-sm">Continuez votre apprentissage</p>
+            </div>
+            <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-full shadow-sm">
+                <div class="text-right">
+                    <p class="text-sm font-bold text-gray-800" id="current-user-name">...</p>
+                    <p class="text-xs text-gray-500" id="current-user-role">...</p>
+                </div>
+                <div
+                    class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Banner -->
+        <div
+            class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-8 mb-8 text-white relative overflow-hidden">
+            <div class="relative z-10">
+                <h2 class="text-3xl font-bold mb-2">Bon retour, <span id="student-name">...</span> !</h2>
+                <p class="opacity-90">Prêt à acquérir de nouvelles compétences aujourd'hui ?</p>
+                <a href="../student/catalogue.html"
+                    class="inline-block mt-6 px-6 py-2 bg-white text-indigo-600 font-bold rounded-lg hover:bg-opacity-90 transition">
+                    Explorer les cours
+                </a>
+            </div>
+            <i class="fas fa-rocket absolute right-10 bottom-[-20px] text-9xl opacity-20"></i>
+        </div>
+
+        <h3 class="font-bold text-xl text-gray-800 mb-4">Mes Cours Récents</h3>
+        <div id="enrolled-courses-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Loaded via JS -->
+        </div>
+
+    </main>
+
+    <script src="../../assets/js/data.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/layout.js"></script>
+    <script>
+        $(document).ready(function () {
+            window.auth.requireRole('ROLE_STUDENT');
+            Layout.init('dashboard');
+
+            $('#student-name').text(window.auth.currentUser.firstname);
+
+            // Load Enrolled Courses (Simulated logic: for now show ALL courses as "Enrolled" for demo or just specific ones)
+            // Real logic: getEnrollmentsByStudent(currentUser.id) -> getCourses
+            // For Demo: Let's pick random courses
+            const allCourses = window.db.getAll('courses');
+            const container = $('#enrolled-courses-list');
+
+            if (allCourses.length === 0) {
+                container.html('<p class="text-gray-500">Aucun cours disponible.</p>');
+            } else {
+                allCourses.forEach(course => {
+                    // In real app, check enrollment here
+                    const html = `
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow">
+                            <div class="h-32 bg-slate-100 flex items-center justify-center text-4xl text-slate-300">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="p-5">
+                                <h4 class="font-bold text-lg mb-2 text-slate-800">${course.title}</h4>
+                                <p class="text-sm text-slate-500 line-clamp-2 mb-4">${course.description}</p>
+                                <a href="#" class="block text-center w-full py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition">
+                                    Continue
+                                </a>
+                            </div>
+                        </div>
+                     `;
+                    container.append(html);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

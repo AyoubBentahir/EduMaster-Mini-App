@@ -1,0 +1,24 @@
+# .gitignore
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dossiers IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Fichiers temporaires
+*.tmp
+*.temp
+~*
+
+# Fichiers de sauvegarde
+*.bak
+*.backup

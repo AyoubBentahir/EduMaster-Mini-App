@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-LMS | Tableau de Bord Enseignant</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <style>
+        /* Sidebar fix pushed content */
+        body {
+            padding-left: 16rem;
+        }
+
+        /* w-64 = 16rem */
+
+        /* Stats Cards Gradients */
+        .stat-card-blue {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #1e40af;
+        }
+
+        .stat-card-green {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: #166534;
+        }
+
+        .stat-card-purple {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            color: #6b21a8;
+        }
+
+        .course-card-premium {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            /* keep horizontal layout */
+            gap: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            border: 1px solid #f1f5f9;
+        }
+
+        .course-card-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: #f8fafc;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar Container -->
+    <aside id="sidebar"></aside>
+
+    <!-- Main Content -->
+    <main class="min-h-screen p-8">
+
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Tableau de Bord</h1>
+                <p class="text-gray-500 text-sm">Vue d'ensemble de vos activités</p>
+            </div>
+            <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-full shadow-sm">
+                <div class="text-right">
+                    <p class="text-sm font-bold text-gray-800" id="current-user-name">...</p>
+                    <p class="text-xs text-gray-500" id="current-user-role">...</p>
+                </div>
+                <div
+                    class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+
+            <!-- Left Column: Content -->
+            <div class="xl:col-span-2 flex flex-col gap-8">
+
+                <!-- Welcome Banner -->
+                <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2">
+                            BIENVENUE, PROF. <span id="teacher-name" class="uppercase">...</span>
+                        </h2>
+                        <p class="text-slate-500 italic">"L'enseignement, c'est allumer un feu et non remplir un vase."
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="stat-card-blue rounded-2xl p-6 text-center shadow-sm border border-blue-100">
+                        <div class="text-4xl font-extrabold mb-1" id="stat-courses">0</div>
+                        <div class="text-xs font-bold uppercase tracking-wider opacity-70">Cours Actifs</div>
+                    </div>
+                    <div class="stat-card-green rounded-2xl p-6 text-center shadow-sm border border-green-100">
+                        <div class="text-4xl font-extrabold mb-1" id="stat-students">0</div>
+                        <div class="text-xs font-bold uppercase tracking-wider opacity-70">Étudiants</div>
+                    </div>
+                    <div class="stat-card-purple rounded-2xl p-6 text-center shadow-sm border border-purple-100">
+                        <div class="text-4xl font-extrabold mb-1" id="stat-resources">0</div>
+                        <div class="text-xs font-bold uppercase tracking-wider opacity-70">Ressources</div>
+                    </div>
+                </div>
+
+                <!-- Latest Courses -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">Vos Derniers Cours</h3>
+                        <a href="courses.html" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold">Tout
+                            voir</a>
+                    </div>
+
+                    <div id="latest-courses-list" class="flex flex-col gap-4">
+                        <!-- Loaded via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Calendar/Profile -->
+            <div class="xl:col-span-1 space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-slate-800 mb-4">Calendrier</h3>
+                    <!-- Mock Calendar -->
+                    <div class="grid grid-cols-7 gap-2 text-center text-sm mb-2">
+                        <span class="text-slate-400 font-bold">L</span>
+                        <span class="text-slate-400 font-bold">M</span>
+                        <span class="text-slate-400 font-bold">M</span>
+                        <span class="text-slate-400 font-bold">J</span>
+                        <span class="text-slate-400 font-bold">V</span>
+                        <span class="text-slate-400 font-bold">S</span>
+                        <span class="text-slate-400 font-bold">D</span>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 text-center text-sm">
+                        <!-- Simple Loop for visuals -->
+                        <span class="p-2 text-slate-300">28</span>
+                        <span class="p-2 text-slate-300">29</span>
+                        <span class="p-2 text-slate-300">30</span>
+                        <span class="p-2">1</span>
+                        <span class="p-2">2</span>
+                        <span class="p-2">3</span>
+                        <span class="p-2">4</span>
+
+                        <span class="p-2">5</span>
+                        <span class="p-2">6</span>
+                        <span class="p-2">7</span>
+                        <span class="p-2 border border-blue-500 rounded-lg text-blue-600 font-bold">8</span>
+                        <span class="p-2">9</span>
+                        <span class="p-2">10</span>
+                        <span class="p-2">11</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/data.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/layout.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Init Layout
+            window.auth.requireRole('ROLE_TEACHER');
+            Layout.init('dashboard');
+
+            // Load Data
+            const teacherId = window.auth.currentUser.id;
+            const courses = window.db.getCoursesByTeacher(teacherId);
+
+            // Stats
+            $('#teacher-name').text(window.auth.currentUser.lastname);
+            $('#stat-courses').text(courses.length);
+
+            // Mock Student Count: Sum of students in teacher's courses (mock logic)
+            // In real schema, we'd query Enrollments where course.teacherId == me
+            let studentCount = 0;
+            courses.forEach(c => {
+                // Find enrollments for this course
+                // We need a helper in DB for this
+                // For now, mockup random or 0
+                studentCount += Math.floor(Math.random() * 10);
+            });
+            $('#stat-students').text(studentCount);
+
+            // Populate Latest Courses
+            const container = $('#latest-courses-list');
+            if (courses.length === 0) {
+                container.html('<div class="p-4 text-center text-slate-500 bg-white rounded-lg">Aucun cours créé.</div>');
+            } else {
+                courses.slice(0, 3).forEach(course => {
+                    const html = `
+                        <div class="course-card-premium">
+                            <div class="icon-box bg-indigo-50 text-indigo-500">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-slate-800">${course.title}</h4>
+                                <p class="text-sm text-slate-500 line-clamp-1">${course.description}</p>
+                            </div>
+                             <a href="courses.html" class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-600 transition-colors">
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    `;
+                    container.append(html);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

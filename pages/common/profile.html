@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduMaster | Mon Profil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            padding-left: 16rem;
+        }
+    </style>
+</head>
+
+<body>
+    <aside id="sidebar"></aside>
+
+    <main class="min-h-screen p-8">
+        <header class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">Mon Profil</h1>
+            <p class="text-gray-500 text-sm">Gérez vos informations personnelles</p>
+        </header>
+
+        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <!-- Profile Card -->
+            <div class="md:col-span-1">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden text-center p-6">
+                    <div
+                        class="w-32 h-32 rounded-full bg-indigo-100 mx-auto mb-4 flex items-center justify-center text-4xl text-indigo-600 border-4 border-white shadow-lg">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-1" id="profile-name">...</h2>
+                    <span
+                        class="inline-block px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-wide mb-6"
+                        id="profile-role">...</span>
+
+                    <div class="border-t border-slate-100 pt-6 text-left">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Email</label>
+                            <div class="text-slate-700 font-medium" id="profile-email">...</div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Inscrit le</label>
+                            <div class="text-slate-700 font-medium" id="profile-joined">...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="md:col-span-2">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <i class="fas fa-edit text-indigo-500"></i> Modifier mes informations
+                    </h3>
+
+                    <form id="profile-form" class="space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Prénom</label>
+                                <input type="text" id="edit-firstname" required
+                                    class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Nom</label>
+                                <input type="text" id="edit-lastname" required
+                                    class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Email</label>
+                            <input type="email" id="edit-email" required
+                                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition bg-slate-50 text-slate-500 cursor-not-allowed"
+                                readonly title="Contactez l'admin pour changer votre email">
+                            <p class="text-xs text-slate-400 mt-1">L'adresse email ne peut pas être modifiée
+                                directement.</p>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100">
+                            <h4 class="text-sm font-bold text-slate-700 mb-4">Changer de mot de passe</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <input type="password" id="new-password"
+                                        class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                                        placeholder="Nouveau mot de passe (laisser vide pour ne pas changer)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-4">
+                            <button type="submit"
+                                class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+                                Enregistrer les modifications
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="../../assets/js/data.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/layout.js"></script>
+    <script>
+        $(document).ready(function () {
+            Layout.init('profile');
+
+            const user = window.auth.currentUser;
+            if (!user) return;
+
+            // Fill Display Info
+            $('#profile-name').text(`${user.firstname} ${user.lastname}`);
+            $('#profile-role').text(Layout.getRoleLabel(user.role));
+            $('#profile-email').text(user.email);
+            const date = new Date(user.createdAt);
+            $('#profile-joined').text(date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }));
+
+            // Fill Form
+            $('#edit-firstname').val(user.firstname);
+            $('#edit-lastname').val(user.lastname);
+            $('#edit-email').val(user.email);
+
+            // Permission Logic: Only Super Admin can edit their own profile here
+            // OR if the requirement means "Everyone can see, but specific roles (Admin/Teacher/Student) cannot edit"
+            // The user said: "Admins... can just see their profile... Teachers/Students... can just see". 
+            // Implies Read-Only for them.
+
+            if (user.role !== 'ROLE_SUPER_ADMIN') {
+                $('input').prop('disabled', true).addClass('bg-slate-50 cursor-not-allowed');
+                $('button[type="submit"]').hide();
+                // Hide the entire password section (header + input)
+                $('#new-password').closest('.border-t').hide();
+                $('.fa-edit').parent().text(' Informations Personnelles'); // Change header text
+            }
+
+            $('#profile-form').on('submit', function (e) {
+                e.preventDefault();
+
+                const updates = {
+                    firstname: $('#edit-firstname').val(),
+                    lastname: $('#edit-lastname').val()
+                };
+
+                const newPass = $('#new-password').val();
+                if (newPass && newPass.trim() !== "") {
+                    updates.password = newPass; // In real app, verify old pass first
+                }
+
+                // Update DB
+                const updatedUser = window.db.update('users', user.id, updates);
+                if (updatedUser) {
+                    // Update Session
+                    window.auth.setSession(updatedUser);
+                    alert('Profil mis à jour avec succès !');
+                    window.location.reload();
+                } else {
+                    alert('Erreur lors de la mise à jour.');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

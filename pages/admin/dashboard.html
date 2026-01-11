@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduMaster | Dashboard Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            padding-left: 16rem;
+        }
+    </style>
+</head>
+
+<body>
+    <aside id="sidebar"></aside>
+
+    <main class="min-h-screen p-8 bg-slate-50">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">Tableau de Bord</h1>
+                <p class="text-slate-500 mt-1">Vue d'ensemble de la plateforme</p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden md:block">
+                    <p class="text-sm font-bold text-slate-800" id="current-user-name">...</p>
+                    <p class="text-xs text-slate-500 uppercase tracking-wide" id="current-user-role">Super Admin</p>
+                </div>
+                <div
+                    class="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-indigo-600 border border-slate-100">
+                    <i class="fas fa-user-shield text-xl"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Admin Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Global Users -->
+            <div
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition cursor-default">
+                <div
+                    class="absolute right-0 top-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:scale-110">
+                </div>
+                <div class="relative z-10">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-4">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1" id="stat-users">0</div>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Utilisateurs</div>
+                </div>
+            </div>
+
+            <!-- Teachers -->
+            <div
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition cursor-default">
+                <div
+                    class="absolute right-0 top-0 w-24 h-24 bg-emerald-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:scale-110">
+                </div>
+                <div class="relative z-10">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-4">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1" id="stat-teachers">0</div>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Enseignants</div>
+                </div>
+            </div>
+
+            <!-- Students -->
+            <div
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition cursor-default">
+                <div
+                    class="absolute right-0 top-0 w-24 h-24 bg-amber-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:scale-110">
+                </div>
+                <div class="relative z-10">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-4">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1" id="stat-students">0</div>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Étudiants</div>
+                </div>
+            </div>
+
+            <!-- Courses -->
+            <div
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition cursor-default">
+                <div
+                    class="absolute right-0 top-0 w-24 h-24 bg-purple-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:scale-110">
+                </div>
+                <div class="relative z-10">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-4">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1" id="stat-courses">0</div>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Cours Actifs</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section - 5+ Charts Required -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" id="charts-section">
+            <!-- Chart 1: Donut Chart - Répartition par Rôle -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-slate-800">Répartition par Rôle</h3>
+                    <span class="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">Donut
+                        Chart</span>
+                </div>
+                <canvas id="rolesChart" height="200"></canvas>
+            </div>
+
+            <!-- Chart 2: Line Chart - Évolution Inscriptions -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-slate-800">Évolution des Inscriptions</h3>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">Line Chart</span>
+                </div>
+                <canvas id="enrollmentsChart" height="200"></canvas>
+            </div>
+
+            <!-- Chart 3: Bar Chart - Cours par Catégorie -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-slate-800">Activité par Mois</h3>
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">Bar
+                        Chart</span>
+                </div>
+                <canvas id="activityChart" height="200"></canvas>
+            </div>
+
+            <!-- Chart 4: Pie Chart - Statut Utilisateurs -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-slate-800">Statut des Utilisateurs</h3>
+                    <span class="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">Pie Chart</span>
+                </div>
+                <canvas id="statusChart" height="200"></canvas>
+            </div>
+
+            <!-- Chart 5: Scatter Plot - Analyse Cours/Modules -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 lg:col-span-2">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-slate-800">Analyse Cours vs Modules</h3>
+                    <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">Scatter Plot</span>
+                </div>
+                <canvas id="scatterChart" height="150"></canvas>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+            <h3 class="text-xl font-bold text-slate-800 mb-6">Actions Rapides</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="users.html"
+                    class="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-indigo-200 hover:shadow-md transition group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-700 text-sm">Nouvel Utilisateur</div>
+                        <div class="text-xs text-slate-400">Créer un compte</div>
+                    </div>
+                </a>
+
+                <a href="users.html"
+                    class="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-emerald-200 hover:shadow-md transition group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-700 text-sm">Gestion Comptes</div>
+                        <div class="text-xs text-slate-400">Gérer les accès</div>
+                    </div>
+                </a>
+
+                <a href="users.html?role=ROLE_TEACHER"
+                    class="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-purple-200 hover:shadow-md transition group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 transition">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-700 text-sm">Enseignants</div>
+                        <div class="text-xs text-slate-400">Voir la liste</div>
+                    </div>
+                </a>
+
+                <a href="users.html?role=ROLE_STUDENT"
+                    class="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-blue-200 hover:shadow-md transition group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-700 text-sm">Étudiants</div>
+                        <div class="text-xs text-slate-400">Voir la liste</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="../../assets/js/data.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/layout.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Allow both Admin types
+            if (!window.auth.isAuthenticated()) window.location.href = '../../index.html';
+
+            Layout.init('dashboard');
+
+            // Data
+            const users = window.db.getAll('users');
+            const admins = users.filter(u => u.role === 'ROLE_ADMIN').length;
+            const teachers = users.filter(u => u.role === 'ROLE_TEACHER').length;
+            const students = users.filter(u => u.role === 'ROLE_STUDENT').length;
+            const courses = window.db.getAll('courses').length;
+
+            $('#stat-users').text(users.length);
+            $('#stat-teachers').text(teachers);
+            $('#stat-students').text(students);
+            $('#stat-courses').text(courses);
+
+            const currentUser = window.auth.currentUser;
+
+            // Logic for Super Admin vs Normal Admin
+            if (currentUser.role === 'ROLE_SUPER_ADMIN') {
+                // Initialize Chart
+                const ctx = document.getElementById('rolesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Admins', 'Enseignants', 'Étudiants'],
+                        datasets: [{
+                            data: [admins, teachers, students],
+                            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } },
+                        cutout: '70%'
+                    }
+                });
+            } else {
+                // Hide Chart Section for Normal Admin
+                $('#rolesChart').closest('.bg-white').hide();
+                // Optionally hide "Global Users" stat if strictly restricted, but user asked for "No graphs"
+            }
+        });
+    </script>
+</body>
+
+</html>

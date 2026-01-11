@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-LMS | Détails du Cours</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../../assets/js/notifications.js"></script>
+    <style>
+        body {
+            padding-left: 16rem;
+        }
+    </style>
+</head>
+
+<body>
+    <aside id="sidebar"></aside>
+
+    <main class="min-h-screen p-8 relative">
+        <header class="mb-8 flex justify-between items-start">
+            <div>
+                <a href="courses.html" class="text-slate-500 hover:text-indigo-600 mb-2 inline-block font-medium">
+                    <i class="fas fa-arrow-left mr-2"></i> Retour aux cours
+                </a>
+                <h1 class="text-3xl font-bold text-gray-800" id="course-title">...</h1>
+                <p class="text-slate-500 mt-1" id="course-description">...</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="openModuleModal()"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold shadow-md transition flex items-center gap-2">
+                    <i class="fas fa-layer-group"></i> Ajouter Module
+                </button>
+            </div>
+        </header>
+
+        <!-- Modules List -->
+        <div id="modules-container" class="space-y-6">
+            <!-- Loaded via JS -->
+        </div>
+
+    </main>
+
+    <!-- MODAL: Add/Edit Module -->
+    <div id="module-modal"
+        class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0"
+            id="module-modal-content">
+            <h3 class="text-xl font-bold text-gray-800 mb-4" id="module-modal-title">Nouveau Module</h3>
+            <form id="module-form" class="space-y-4">
+                <input type="hidden" id="module-id">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Titre du module</label>
+                    <input type="text" id="module-title" required
+                        class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Description</label>
+                    <textarea id="module-desc" rows="3"
+                        class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeModuleModal()"
+                        class="px-4 py-2 text-slate-500 hover:bg-slate-50 rounded-lg">Annuler</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Add/Edit Resource -->
+    <div id="resource-modal"
+        class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0"
+            id="resource-modal-content">
+            <h3 class="text-xl font-bold text-gray-800 mb-4" id="resource-modal-title">Nouvelle Ressource</h3>
+            <form id="resource-form" class="space-y-6">
+                <input type="hidden" id="resource-module-id">
+                <input type="hidden" id="resource-id">
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Titre de la ressource</label>
+                    <input type="text" id="resource-title" requiredplaceholder="Ex: Chapitre 1 - Slides"
+                        class="w-full px-4 py-3 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700 transition">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Type de contenu</label>
+                    <div class="grid grid-cols-4 gap-2" id="type-selector">
+                        <button type="button" data-type="video"
+                            class="type-btn active flex flex-col items-center justify-center p-3 rounded-xl border-2 border-indigo-500 bg-indigo-50 text-indigo-700 transition">
+                            <i class="fas fa-video text-xl mb-1"></i>
+                            <span class="text-xs font-bold">Vidéo</span>
+                        </button>
+                        <button type="button" data-type="pdf"
+                            class="type-btn flex flex-col items-center justify-center p-3 rounded-xl border-2 border-transparent bg-slate-50 text-slate-500 hover:bg-slate-100 transition">
+                            <i class="fas fa-file-pdf text-xl mb-1"></i>
+                            <span class="text-xs font-bold">PDF</span>
+                        </button>
+                        <button type="button" data-type="link"
+                            class="type-btn flex flex-col items-center justify-center p-3 rounded-xl border-2 border-transparent bg-slate-50 text-slate-500 hover:bg-slate-100 transition">
+                            <i class="fas fa-link text-xl mb-1"></i>
+                            <span class="text-xs font-bold">Lien</span>
+                        </button>
+                        <button type="button" data-type="text"
+                            class="type-btn flex flex-col items-center justify-center p-3 rounded-xl border-2 border-transparent bg-slate-50 text-slate-500 hover:bg-slate-100 transition">
+                            <i class="fas fa-align-left text-xl mb-1"></i>
+                            <span class="text-xs font-bold">Texte</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="resource-type" value="video">
+                </div>
+
+                <div id="content-input-container">
+                    <label class="block text-sm font-bold text-slate-700 mb-2" id="content-label">Lien de la vidéo
+                        (Youtube, Vimeo...)</label>
+                    <div class="relative">
+                        <i class="fas fa-link absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="resource-content" required
+                            class="w-full pl-11 pr-4 py-3 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-indigo-500 font-medium text-slate-700"
+                            placeholder="https://...">
+                    </div>
+                    <!-- Real File Input -->
+                    <div id="file-upload-area" class="hidden">
+                        <input type="file" id="file-input" accept=".pdf,.mp4,.avi,.mov" class="hidden">
+                        <label for="file-input"
+                            class="block border-2 border-dashed border-indigo-300 rounded-xl p-8 text-center bg-indigo-50/30 hover:bg-indigo-50 hover:border-indigo-400 transition cursor-pointer group">
+                            <div
+                                class="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-lg">
+                                <i class="fas fa-cloud-upload-alt text-2xl"></i>
+                            </div>
+                            <p class="text-sm font-bold text-slate-700 mb-1">Cliquez ou glissez un fichier ici</p>
+                            <p class="text-xs text-slate-500">PDF, MP4, AVI, MOV (Max 50MB)</p>
+                            <div id="file-name-display" class="mt-3 hidden">
+                                <div
+                                    class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
+                                    <i class="fas fa-file-alt text-indigo-600"></i>
+                                    <span class="text-sm font-medium text-slate-700" id="file-name-text"></span>
+                                    <button type="button" onclick="clearFileInput()"
+                                        class="text-slate-400 hover:text-red-500 ml-2">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeResourceModal()"
+                        class="px-5 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition">Annuler</button>
+                    <button type="submit"
+                        class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../assets/js/data.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/layout.js"></script>
+    <script>
+        $(document).ready(function () {
+            window.auth.requireRole('ROLE_TEACHER');
+            Layout.init('courses');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id');
+            let currentCourse = null;
+
+            if (!courseId) window.location.href = 'courses.html';
+
+            function loadCourseData() {
+                currentCourse = window.db.getById('courses', courseId);
+                if (!currentCourse) return;
+
+                $('#course-title').text(currentCourse.title);
+                $('#course-description').text(currentCourse.description);
+
+                renderModules();
+            }
+
+            function renderModules() {
+                const container = $('#modules-container');
+                container.empty();
+
+                if (!currentCourse.modules || currentCourse.modules.length === 0) {
+                    container.html('<div class="text-center py-10 bg-white rounded-xl border border-dashed border-slate-300 text-slate-400">Ce cours ne contient aucun module pour le moment.</div>');
+                    return;
+                }
+
+                currentCourse.modules.forEach((module, index) => {
+                    let resourcesHtml = '';
+                    if (module.resources && module.resources.length > 0) {
+                        module.resources.forEach((res, rIndex) => {
+                            let icon = 'fa-file';
+                            if (res.type === 'video') icon = 'fa-video';
+                            if (res.type === 'pdf') icon = 'fa-file-pdf';
+                            if (res.type === 'link') icon = 'fa-link';
+
+                            resourcesHtml += `
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-white hover:shadow-sm transition group">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded bg-white border border-slate-200 flex items-center justify-center text-indigo-500">
+                                            <i class="fas ${icon}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-slate-700 text-sm">${res.title}</div>
+                                            <div class="text-xs text-slate-400 truncate max-w-[200px]">${res.content}</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                                        <button onclick="deleteResource(${index}, ${rIndex})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        resourcesHtml = '<div class="text-xs text-slate-400 italic pl-2">Aucune ressource.</div>';
+                    }
+
+                    const html = `
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                            <div class="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                                <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">${index + 1}</span>
+                                    ${module.title}
+                                </h3>
+                                <div class="flex gap-2">
+                                    <button onclick="openResourceModal(${index})" class="text-sm bg-white border border-slate-200 px-3 py-1 rounded-md text-slate-600 hover:text-indigo-600 shadow-sm">
+                                        <i class="fas fa-plus mr-1"></i> Ressource
+                                    </button>
+                                    <button onclick="deleteModule(${index})" class="text-slate-400 hover:text-red-600 px-2">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="p-4 space-y-2">
+                                ${resourcesHtml}
+                            </div>
+                        </div>
+                    `;
+                    container.append(html);
+                });
+            }
+
+            loadCourseData();
+
+            // --- MODULE MODAL & LOGIC ---
+            window.openModuleModal = function () {
+                $('#module-modal').removeClass('hidden');
+                setTimeout(() => $('#module-modal-content').removeClass('scale-95 opacity-0').addClass('scale-100 opacity-100'), 10);
+            };
+
+            window.closeModuleModal = function () {
+                $('#module-modal-content').removeClass('scale-100 opacity-100').addClass('scale-95 opacity-0');
+                setTimeout(() => $('#module-modal').addClass('hidden'), 300);
+                $('#module-form')[0].reset();
+            };
+
+            $('#module-form').on('submit', function (e) {
+                e.preventDefault();
+                const newModule = {
+                    title: $('#module-title').val(),
+                    description: $('#module-desc').val(),
+                    resources: []
+                };
+
+                if (!currentCourse.modules) currentCourse.modules = [];
+                currentCourse.modules.push(newModule);
+                window.db.update('courses', courseId, { modules: currentCourse.modules });
+
+                window.notifications.success(`Module "${newModule.title}" ajouté avec succès`);
+                closeModuleModal();
+                renderModules();
+            });
+
+            window.deleteModule = function (index) {
+                const moduleName = currentCourse.modules[index].title;
+                if (confirm('Supprimer ce module ?')) {
+                    currentCourse.modules.splice(index, 1);
+                    window.db.update('courses', courseId, { modules: currentCourse.modules });
+                    window.notifications.success(`Module "${moduleName}" supprimé`);
+                    renderModules();
+                }
+            };
+
+
+            // --- RESOURCE MODAL & LOGIC ---
+
+            // Type Selector Logic
+            $(document).on('click', '.type-btn', function () {
+                $('.type-btn').removeClass('active border-indigo-500 bg-indigo-50 text-indigo-700').addClass('border-transparent bg-slate-50 text-slate-500');
+                $(this).addClass('active border-indigo-500 bg-indigo-50 text-indigo-700').removeClass('border-transparent bg-slate-50 text-slate-500');
+
+                const type = $(this).data('type');
+                $('#resource-type').val(type);
+
+                // Update UI based on type
+                const contentContainer = $('#content-input-container');
+                const label = $('#content-label');
+                const fileArea = $('#file-upload-area');
+                const textInput = contentContainer.find('input[type="text"]');
+
+                fileArea.addClass('hidden');
+                textInput.parent().removeClass('hidden');
+                $('#file-name-display').addClass('hidden');
+                $('#file-input').val('');
+
+                if (type === 'video') {
+                    label.text('Lien de la vidéo (Youtube, Vimeo...) ou importer un fichier');
+                    textInput.attr('placeholder', 'https://youtube.com/... ou utilisez le bouton ci-dessous');
+                    // Show file upload option for video too
+                    fileArea.removeClass('hidden');
+                    textInput.parent().addClass('hidden');
+                    $('#file-input').attr('accept', '.mp4,.avi,.mov,.webm');
+                } else if (type === 'pdf') {
+                    label.text('Importer le document PDF');
+                    textInput.parent().addClass('hidden');
+                    fileArea.removeClass('hidden');
+                    $('#file-input').attr('accept', '.pdf');
+                } else if (type === 'link') {
+                    label.text('Lien externe');
+                    textInput.attr('placeholder', 'https://...');
+                } else {
+                    label.text('Contenu texte');
+                    textInput.attr('placeholder', 'Contenu du cours...');
+                }
+            });
+
+            // File Upload Handler
+            $('#file-input').on('change', function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Check file size (50MB limit)
+                if (file.size > 50 * 1024 * 1024) {
+                    window.notifications.error('Le fichier est trop volumineux. Taille maximale : 50MB');
+                    $(this).val('');
+                    return;
+                }
+
+                // Display file name
+                $('#file-name-text').text(file.name);
+                $('#file-name-display').removeClass('hidden');
+                window.notifications.info('Fichier chargé : ' + file.name);
+
+                // Read file as base64 for demo storage
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    // Store base64 in the hidden content field
+                    $('#resource-content').val(event.target.result);
+                    window.notifications.success('Fichier prêt à être enregistré');
+                };
+                reader.onerror = function () {
+                    window.notifications.error('Erreur lors de la lecture du fichier');
+                };
+                reader.readAsDataURL(file);
+            });
+
+            window.clearFileInput = function () {
+                $('#file-input').val('');
+                $('#file-name-display').addClass('hidden');
+                $('#resource-content').val('');
+            };
+
+            window.openResourceModal = function (moduleIndex) {
+                $('#resource-module-id').val(moduleIndex);
+                $('#resource-modal').removeClass('hidden');
+                setTimeout(() => $('#resource-modal-content').removeClass('scale-95 opacity-0').addClass('scale-100 opacity-100'), 10);
+            };
+
+            window.closeResourceModal = function () {
+                $('#resource-modal-content').removeClass('scale-100 opacity-100').addClass('scale-95 opacity-0');
+                setTimeout(() => $('#resource-modal').addClass('hidden'), 300);
+                $('#resource-form')[0].reset();
+                clearFileInput();
+            };
+
+            $('#resource-form').on('submit', function (e) {
+                e.preventDefault();
+                const moduleIndex = $('#resource-module-id').val();
+                const newRes = {
+                    title: $('#resource-title').val(),
+                    type: $('#resource-type').val(),
+                    content: $('#resource-content').val()
+                };
+
+                if (!currentCourse.modules[moduleIndex].resources) currentCourse.modules[moduleIndex].resources = [];
+                currentCourse.modules[moduleIndex].resources.push(newRes);
+                window.db.update('courses', courseId, { modules: currentCourse.modules });
+
+                window.notifications.success(`Ressource "${newRes.title}" ajoutée`);
+                closeResourceModal();
+                renderModules();
+            });
+
+            window.deleteResource = function (modIndex, resIndex) {
+                const resName = currentCourse.modules[modIndex].resources[resIndex].title;
+                if (confirm('Supprimer cette ressource ?')) {
+                    currentCourse.modules[modIndex].resources.splice(resIndex, 1);
+                    window.db.update('courses', courseId, { modules: currentCourse.modules });
+                    window.notifications.success(`Ressource "${resName}" supprimée`);
+                    renderModules();
+                }
+            };
+
+        });
+    </script>
+</body>
+
+</html>

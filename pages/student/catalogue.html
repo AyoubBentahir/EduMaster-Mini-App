@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-LMS | Catalogue</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            padding-left: 16rem;
+        }
+    </style>
+</head>
+
+<body>
+    <aside id="sidebar"></aside>
+
+    <main class="min-h-screen p-8">
+        <header class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">Catalogue des Cours</h1>
+            <p class="text-gray-500 text-sm">Découvrez de nouvelles opportunités d'apprentissage</p>
+        </header>
+
+        <div id="catalogue-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Loaded via JS -->
+        </div>
+    </main>
+
+    <script src="../../assets/js/data.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/layout.js"></script>
+    <script>
+        $(document).ready(function () {
+            window.auth.requireRole('ROLE_STUDENT');
+            Layout.init('catalogue');
+
+            const allCourses = window.db.getAll('courses');
+            const studentId = window.auth.currentUser.id;
+            const enrollments = window.db.getEnrollmentsByStudent(studentId);
+            const enrolledCourseIds = enrollments.map(e => e.courseId);
+
+            const container = $('#catalogue-grid');
+
+            if (allCourses.length === 0) {
+                container.html('<div class="col-span-full text-center py-10 text-gray-400">Aucun cours disponible dans le catalogue.</div>');
+            } else {
+                allCourses.forEach(course => {
+                    const isEnrolled = enrolledCourseIds.includes(course.id);
+                    const teacher = window.db.getById('users', course.teacherId);
+                    const teacherName = teacher ? `${teacher.firstname} ${teacher.lastname}` : 'Inconnu';
+
+                    const html = `
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition flex flex-col h-full">
+                            <div class="p-6 flex-1">
+                                <div class="text-xs font-bold text-indigo-500 bg-indigo-50 inline-block px-2 py-1 rounded-md mb-3">
+                                    ${course.codeUnique || 'COURS'}
+                                </div>
+                                <h3 class="font-bold text-lg text-slate-800 mb-2">${course.title}</h3>
+                                <p class="text-sm text-slate-500 line-clamp-3 mb-4">${course.description}</p>
+                                <div class="flex items-center gap-2 text-xs text-slate-400">
+                                    <i class="fas fa-user-circle"></i> Par ${teacherName}
+                                </div>
+                            </div>
+                            <div class="p-4 bg-slate-50 border-t border-slate-100">
+                                ${isEnrolled
+                            ? `<a href="course-view.html?id=${course.id}" class="block w-full text-center py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition">Continuer</a>`
+                            : `<button onclick="enroll(${course.id})" class="block w-full text-center py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition">S'inscrire</button>`
+                        }
+                            </div>
+                        </div>
+                    `;
+                    container.append(html);
+                });
+            }
+
+            window.enroll = function (courseId) {
+                const enrollment = {
+                    userId: studentId,
+                    courseId: courseId,
+                    enrolledAt: new Date().toISOString()
+                };
+                window.db.add('enrollments', enrollment);
+                alert('Inscription réussie !');
+                window.location.reload();
+            };
+        });
+    </script>
+</body>
+
+</html>

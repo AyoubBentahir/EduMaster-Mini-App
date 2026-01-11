@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-LMS | Contenu du Cours</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            padding-left: 16rem;
+        }
+    </style>
+</head>
+
+<body>
+    <aside id="sidebar"></aside>
+
+    <main class="min-h-screen p-8">
+        <header class="mb-8">
+            <a href="my-courses.html" class="text-slate-500 hover:text-indigo-600 mb-2 inline-block font-medium">
+                <i class="fas fa-arrow-left mr-2"></i> Mes cours
+            </a>
+            <h1 class="text-3xl font-bold text-gray-800" id="course-title">...</h1>
+            <p class="text-slate-500 mt-1" id="course-description">...</p>
+        </header>
+
+        <!-- Modules List -->
+        <div id="modules-container" class="space-y-6 max-w-4xl">
+            <!-- Loaded via JS -->
+        </div>
+
+    </main>
+
+    <script src="../../assets/js/data.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/layout.js"></script>
+    <script>
+        $(document).ready(function () {
+            window.auth.requireRole('ROLE_STUDENT');
+            Layout.init('my-courses'); // Highlight 'Mes Cours'
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id');
+            const course = window.db.getById('courses', courseId);
+
+            if (!course) window.location.href = 'my-courses.html';
+
+            $('#course-title').text(course.title);
+            $('#course-description').text(course.description);
+
+            const container = $('#modules-container');
+
+            if (!course.modules || course.modules.length === 0) {
+                container.html('<div class="text-center py-10 bg-white rounded-xl text-slate-400">Ce cours n\'a pas encore de contenu.</div>');
+            } else {
+                course.modules.forEach((module, index) => {
+                    let resourcesHtml = '';
+                    if (module.resources && module.resources.length > 0) {
+                        module.resources.forEach(res => {
+                            let icon = 'fa-file';
+                            let action = 'Ouvrir';
+
+                            if (res.type === 'video') { icon = 'fa-play-circle'; action = 'Regarder'; }
+                            if (res.type === 'pdf') { icon = 'fa-file-pdf'; action = 'Télécharger'; }
+                            if (res.type === 'link') { icon = 'fa-link'; action = 'Visiter'; }
+
+                            let contentLink = res.content;
+                            // In a real app we would sanitize and handle embeds. 
+                            // Here we just make it a link.
+
+                            resourcesHtml += `
+                                <a href="${contentLink}" target="_blank" class="flex items-center justify-between p-4 bg-white rounded-lg border border-slate-100 hover:border-indigo-200 hover:shadow-md transition group mb-2">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">
+                                            <i class="fas ${icon}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-slate-700 group-hover:text-indigo-700 transition">${res.title}</div>
+                                            <div class="text-xs text-slate-400 uppercase tracking-wider">${res.type}</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm font-bold text-indigo-600 opacity-0 group-hover:opacity-100 transition">
+                                        ${action} <i class="fas fa-external-link-alt ml-1"></i>
+                                    </div>
+                                </a>
+                            `;
+                        });
+                    } else {
+                        resourcesHtml = '<div class="text-sm text-slate-400 italic px-4 pb-2">Aucune ressource disponible.</div>';
+                    }
+
+                    const html = `
+                        <div class="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                            <div class="p-4 border-b border-slate-200 bg-slate-100 flex items-center justify-between cursor-pointer" onclick="$(this).next().slideToggle()">
+                                <h3 class="font-bold text-lg text-slate-700">Module ${index + 1}: ${module.title}</h3>
+                                <i class="fas fa-chevron-down text-slate-400"></i>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-sm text-slate-600 mb-4">${module.description}</p>
+                                ${resourcesHtml}
+                            </div>
+                        </div>
+                    `;
+                    container.append(html);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-LMS | Connexion</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🎓</text></svg>">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <style>
+        /* Login Specific Styles to match the Premium look */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background-color: #f3f4f6;
+        }
+
+        .login-box {
+            display: flex;
+            width: 100%;
+            max-width: 1000px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .login-left {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+            position: relative;
+        }
+
+        .login-left::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://www.transparenttextures.com/patterns/cubes.png');
+            opacity: 0.1;
+        }
+
+        .login-right {
+            flex: 1;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-container i {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 1rem;
+            color: #9ca3af;
+        }
+
+        .input-container input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-container input:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="login-box">
+            <!-- Left Side: Welcome Panel -->
+            <div class="login-left relative overflow-hidden">
+                <!-- Background Decoration -->
+                <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+                    <i class="fas fa-shapes absolute top-10 left-10 text-6xl"></i>
+                    <i class="fas fa-code absolute bottom-20 right-10 text-8xl"></i>
+                    <i
+                        class="fas fa-atom absolute top-1/2 left-1/2 text-9xl transform -translate-x-1/2 -translate-y-1/2"></i>
+                </div>
+
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div>
+                        <div
+                            class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl mb-6 backdrop-blur-sm">
+                            <i class="fas fa-shapes"></i>
+                        </div>
+                        <h2 class="text-5xl font-extrabold mb-4 tracking-tight">EduMaster</h2>
+                        <p class="text-xl opacity-90 leading-relaxed font-light">
+                            La plateforme d'apprentissage nouvelle génération.
+                        </p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                            <div class="w-10 h-10 rounded-full bg-green-400/20 flex items-center justify-center">
+                                <i class="fas fa-check text-green-300"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">Accès Illimité</h4>
+                                <p class="text-xs opacity-70">Aux ressources de cours</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Login Form -->
+            <div class="login-right">
+                <div class="login-form-content">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Bon retour !</h1>
+                    <p class="text-gray-500 mb-8">Veuillez vous identifier pour continuer.</p>
+
+                    <div id="error-message"
+                        class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r-lg"
+                        role="alert">
+                        <p class="font-bold">Erreur</p>
+                        <p id="error-text" class="text-sm"></p>
+                    </div>
+
+                    <form id="loginForm">
+                        <div class="input-container group">
+                            <i class="fas fa-envelope group-focus-within:text-indigo-600 transition-colors"></i>
+                            <input type="email" id="inputEmail" placeholder="Adresse Email" required autofocus
+                                value="teacher@test.com"
+                                class="bg-gray-50 group-focus-within:bg-white transition-colors">
+                        </div>
+
+                        <div class="input-container group">
+                            <i class="fas fa-lock group-focus-within:text-indigo-600 transition-colors"></i>
+                            <input type="password" id="inputPassword" placeholder="Mot de passe" required
+                                value="password123" class="bg-gray-50 group-focus-within:bg-white transition-colors">
+                            <i class="fas fa-eye cursor-pointer hover:text-indigo-600 transition-colors"
+                                id="togglePassword" style="left: auto; right: 1rem;"></i>
+                        </div>
+
+                        <div class="flex justify-between items-center mb-6 text-sm">
+                            <label class="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-800">
+                                <input type="checkbox"
+                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                <span>Se souvenir de moi</span>
+                            </label>
+                            <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">Mot de passe oublié
+                                ?</a>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn-login group relative overflow-hidden">
+                                <span class="relative z-10 flex items-center justify-center gap-2">
+                                    Se connecter <i
+                                        class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <p class="text-center text-gray-400 text-xs mt-8 absolute bottom-4 w-full left-0">
+                    © 2026 EduMaster v1.0
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Toggle Password
+            $('#togglePassword').click(function () {
+                const input = $('#inputPassword');
+                const icon = $(this);
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            // Handle Login
+            $('#loginForm').on('submit', function (e) {
+                e.preventDefault();
+                const email = $('#inputEmail').val();
+                const password = $('#inputPassword').val();
+
+                const result = window.auth.login(email, password);
+
+                if (result.success) {
+                    // Redirect based on role
+                    window.location.href = window.auth.getDashboardUrl(result.user.role);
+                } else {
+                    $('#error-text').text(result.message);
+                    $('#error-message').removeClass('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

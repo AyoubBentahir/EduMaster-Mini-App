@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-LMS | Éditer Cours</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            padding-left: 16rem;
+        }
+    </style>
+</head>
+
+<body>
+    <aside id="sidebar"></aside>
+
+    <main class="min-h-screen p-8">
+        <div class="max-w-3xl mx-auto">
+            <header class="mb-8">
+                <a href="courses.html" class="text-slate-500 hover:text-indigo-600 mb-4 inline-block font-medium">
+                    <i class="fas fa-arrow-left mr-2"></i> Retour aux cours
+                </a>
+                <h1 class="text-2xl font-bold text-gray-800" id="page-title">Créer un Nouveau Cours</h1>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-lg border border-slate-100 p-8">
+                <form id="course-form" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Titre du Cours</label>
+                        <input type="text" id="title" required
+                            class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition"
+                            placeholder="Ex: Introduction à l'Algorithmique">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Code Unique</label>
+                        <input type="text" id="codeUnique" required
+                            class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition"
+                            placeholder="Ex: ALGO101">
+                        <p class="text-xs text-slate-400 mt-1">Identifiant unique pour ce cours.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Description</label>
+                        <textarea id="description" rows="5" required
+                            class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition"
+                            placeholder="Décrivez les objectifs et le contenu du cours..."></textarea>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-100 flex justify-end gap-4">
+                        <a href="courses.html"
+                            class="px-6 py-3 rounded-lg font-bold text-slate-500 hover:bg-slate-50 transition">Annuler</a>
+                        <button type="submit"
+                            class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+                            <i class="fas fa-save mr-2"></i> Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../assets/js/data.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/layout.js"></script>
+    <script>
+        $(document).ready(function () {
+            window.auth.requireRole('ROLE_TEACHER');
+            Layout.init('courses');
+
+            // Check if editing
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id');
+
+            if (courseId) {
+                $('#page-title').text('Modifier le Cours');
+                const course = window.db.getById('courses', courseId);
+                if (course) {
+                    if (course.teacherId !== window.auth.currentUser.id) {
+                        alert('Accès non autorisé');
+                        window.location.href = 'courses.html';
+                    }
+                    $('#title').val(course.title);
+                    $('#codeUnique').val(course.codeUnique);
+                    $('#description').val(course.description);
+                }
+            }
+
+            $('#course-form').on('submit', function (e) {
+                e.preventDefault();
+
+                const data = {
+                    title: $('#title').val(),
+                    codeUnique: $('#codeUnique').val(),
+                    description: $('#description').val(),
+                    teacherId: window.auth.currentUser.id
+                };
+
+                if (courseId) {
+                    window.db.update('courses', courseId, data);
+                } else {
+                    data.modules = []; // Init modules for new course
+                    window.db.add('courses', data);
+                }
+
+                window.location.href = 'courses.html';
+            });
+        });
+    </script>
+</body>
+
+</html>
